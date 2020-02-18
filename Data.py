@@ -44,6 +44,34 @@ class Data:
 
             res = requests.request("GET", url, data = payload, headers = headers, params = queryString)
             print(res.text)
-            return res.text
+            return res.json()
+    
+    def getLibringData(self, startDate, endDate):
+        """
+        Libring request API:
+        https://api.libring.com/v2/reporting/get
+
+        Auth: 
+        token	‘Authorization’=>”Token TOKEN_CODE”
+        """
+
+        url = "https://api.libring.com/v2/reporting/get"
+
+        queryString = {
+            "period": "custom_date",
+            "start_date": startDate,
+            "end_date": endDate,
+            "group_by": "date,app"
+        }
+
+        headers = {
+            "cache-control": "no-cache",
+            "Authorization": "Token " + credentials['libring_token']
+        }
+        payload = ''
+
+        res = requests.request('GET', url, headers = headers, params = queryString, data = payload)
+
+        return res.json()
 
 

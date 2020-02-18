@@ -2,7 +2,12 @@
 Main class to manage all API request from 3rd parties
 """
 import requests 
+import os
+import pandas as pd
 from credentials import credentials
+from apiclient import sample_tools
+from oauth2client.service_account import ServiceAccountCredentials
+from googleapiclient.discovery import build
 
 class Data:
     
@@ -74,4 +79,34 @@ class Data:
 
         return res.json()
 
+    def getDailyActiveUsers(self):
+    # "/Users/juliosanchez/Documents/dashboard/dau_data/export.csv"
+        temp = []
+        folderName = 'dau_data'
+        folder = os.getcwd() + '/' + folderName
 
+        for sub, dirs, files in os.walk(folder):
+            for file in files:
+                df = pd.read_csv(os.path.join(sub, file))
+                
+                temp.append(df)
+        return pd.concat(temp)
+
+    def getAdmobData(self):
+        url = "https://admob.googleapis.com/v1/accounts"
+        creds = ServiceAccountCredentials.from_json_keyfile_name('service-account.json', scopes= "https://www.googleapis.com/auth/admob.report")
+        
+        accessToken = creds.get_access_token()
+        
+        print(accessToken.access_token)
+        headers = {
+            "cache-control": 'no-cache',
+            "Authorization": 'Bearer ' + accessToken.access_token
+        }
+        payload = ''
+
+        print(headers['Authorization'])
+
+        res = requests.request('GET', url, headers = headers, data = payload)
+        print(res.text)
+        

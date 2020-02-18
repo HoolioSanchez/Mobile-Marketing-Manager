@@ -8,6 +8,7 @@ class Data:
     
     def __ironsourceBearerAuth(self):
         """
+        Bearer API authentication is needed for the use of ironSource’s Application API and Instance API.
         GET platform.ironsrc.com/partners/publisher/auth
         """
         url = "https://platform.ironsrc.com/partners/publisher/auth"
@@ -46,5 +47,3 @@ class Data:
             return res.text
 
 
-data = Data()
-data.getIronsourceData('2020-02-10', '2020-02-15')

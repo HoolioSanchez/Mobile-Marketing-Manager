@@ -6,10 +6,10 @@ import os
 import pandas as pd
 from pandas.io.json import json_normalize
 from credentials import credentials
-from apiclient import sample_tools
-from oauth2client.service_account import ServiceAccountCredentials
-from googleapiclient.discovery import build
-import httplib2
+# from apiclient import sample_tools
+# from oauth2client.service_account import ServiceAccountCredentials
+# from googleapiclient.discovery import build
+# import httplib2
 
 class Data:
     
@@ -51,7 +51,7 @@ class Data:
 
             res = requests.request("GET", url, data = payload, headers = headers, params = queryString)
             print(res.text)
-            return json_normalize(res.json())
+            return res.json()
     
     def getLibringData(self, startDate, endDate):
         """
@@ -78,6 +78,8 @@ class Data:
         payload = ''
 
         res = requests.request('GET', url, headers = headers, params = queryString, data = payload)
+        
+        print(res.text)
 
         return res.json()
 
@@ -94,22 +96,22 @@ class Data:
                 temp.append(df)
         return pd.concat(temp)
 
-    def __admobBearerAuth(self):
+    # def __admobBearerAuth(self):
 
-        creds = ServiceAccountCredentials.from_json_keyfile_name('admob-api.json', scopes= "https://www.googleapis.com/auth/admob.report")
-        accessToken = creds.get_access_token()
+    #     creds = ServiceAccountCredentials.from_json_keyfile_name('admob-api.json', scopes= "https://www.googleapis.com/auth/admob.report")
+    #     accessToken = creds.get_access_token()
 
-        return accessToken.access_token
+    #     return accessToken.access_token
        
-    def getAdmobData(self):
-        url = "https://admob.googleapis.com/v1/accounts/pub-1694638389384549"
+    # def getAdmobData(self):
+    #     url = "https://admob.googleapis.com/v1/accounts/pub-1694638389384549"
 
-        headers = {
-            "Authorization": "Bearer " + self.__admobBearerAuth()
-        }
+    #     headers = {
+    #         "Authorization": "Bearer " + self.__admobBearerAuth()
+    #     }
 
-        payload = ''
+    #     payload = ''
 
-        res = requests.request("GET", url, headers = headers, data = payload)
+    #     res = requests.request("GET", url, headers = headers, data = payload)
 
-        print(res.text)
+    #     print(res.text)

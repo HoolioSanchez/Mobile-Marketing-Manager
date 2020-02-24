@@ -36,6 +36,9 @@ class DataManager:
             temp.append(item)
 
         return pd.DataFrame(temp)
+
+    def retentionDataFrame(self, path):
+        return self.data.getRetention(path)
     
     def calculateRetentionPct(self, dataframe):
         """

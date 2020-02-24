@@ -38,7 +38,7 @@ class Data:
             queryString = {
                 "startDate": startDate,
                 "endDate": endDate,
-                "breakdown": 'app'
+                "breakdown": 'app,country'
             }
 
             auth = self.__ironsourceBearerAuth()
@@ -105,7 +105,6 @@ class Data:
         for sub, dirs, files in os.walk(folder):
             for file in files:
                 df = pd.read_csv(os.path.join(sub, file))
-                
                 temp.append(df)
         return pd.concat(temp)
 

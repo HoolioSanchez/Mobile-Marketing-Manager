@@ -38,6 +38,12 @@ class DataManager:
         return pd.DataFrame(temp)
     
     def calculateRetentionPct(self, dataframe):
+        """
+        Adds Retention percentage for Day 1,7,14,and 90 to Dataframe
+
+        Required Param: 
+        Pandas Dataframe
+        """
         dataframe['Day_1_Pct'] = dataframe.RETENTION_1_QTY/dataframe.INSTALL_QTY
         dataframe['Day_7_Pct'] = dataframe.RETENTION_7_QTY/dataframe.INSTALL_QTY
         dataframe['Day_14_Pct'] = dataframe.RETENTION_14_QTY/dataframe.INSTALL_QTY

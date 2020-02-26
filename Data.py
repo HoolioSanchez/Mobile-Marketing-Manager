@@ -38,7 +38,7 @@ class Data:
             queryString = {
                 "startDate": startDate,
                 "endDate": endDate,
-                "breakdown": 'app,country'
+                "breakdown": 'app'
             }
 
             auth = self.__ironsourceBearerAuth()

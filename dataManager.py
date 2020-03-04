@@ -52,6 +52,7 @@ class DataManager:
         Pandas Dataframe
         """
         dataframe['Day_1_Pct'] = dataframe.RETENTION_1_QTY/dataframe.INSTALL_QTY
+        dataframe['Day_3_Pct'] = dataframe.RETENTION_3_QTY/dataframe.INSTALL_QTY
         dataframe['Day_7_Pct'] = dataframe.RETENTION_7_QTY/dataframe.INSTALL_QTY
         dataframe['Day_14_Pct'] = dataframe.RETENTION_14_QTY/dataframe.INSTALL_QTY
         dataframe['Day_30_Pct'] = dataframe.RETENTION_30_QTY/dataframe.INSTALL_QTY
@@ -63,18 +64,20 @@ class DataManager:
     def totalRetentionAverage(self, dataframe):
         temp = []
         day_1 = dataframe['Day_1_Pct'].mean().mean()
+        day_3 = dataframe['Day_3_Pct'].mean().mean()
         day_7 = dataframe['Day_7_Pct'].mean().mean()
         day_14 = dataframe['Day_14_Pct'].mean().mean()
         day_30 = dataframe['Day_30_Pct'].mean().mean()
         day_60 = dataframe['Day_60_Pct'].mean().mean()
-        # day_90 = dataframe['Day_90_Pct'].mean().mean()
+        day_90 = dataframe['Day_90_Pct'].mean().mean()
 
         temp.append(day_1)
+        temp.append(day_3)
         temp.append(day_7)
         temp.append(day_14)
         temp.append(day_30)
         temp.append(day_60)
-        # temp.append(day_90)
+        temp.append(day_90)
 
         np_array = np.array(temp) * 100
 

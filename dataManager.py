@@ -93,7 +93,7 @@ class DataManager:
         And, returning a Pandas Dataframe: 
         days, retention, totalDaysPlayed, LTV
 
-        Required_Params: 
+        Required Params: 
         Days = array of days cohort
         retention = retention values of cohort
         arpdau = average revenue per daily active user
@@ -126,6 +126,58 @@ class DataManager:
         ltv_df.set_index('Days', inplace=True)
 
         return ltv_df
+
+    def coef_retention_curve(self, n_days, n_retention):
+        """
+        y = a*x^b
+        Returns the values for a and b
+
+        Required Params: 
+        Days = array of days cohort (ignores day 0)
+        retention = retention values of cohort (ignores day 0)
+        """
+
+        log_days = np.log(n_days)
+        log_retention = np.log(n_retention)
+
+        a = np.exp(np.polyfit(log_days[1:], log_retention[1:], 1))
+        a = a[1]
+
+        b = np.polyfit(log_days[1:], log_retention[1:], 1)
+        b = b[0]
+
+        return a,b
+    
+    def project_retention_rates(self, n_days_to_project, days, retention):
+        """
+        Uses a power function to calculate the projected retention rates for given n_days. 
+
+        Formula:
+        y = a*x^b
+
+        Required Params: 
+        n_days_to_project = the number of days to project too.
+        Days = original days cohort relative to retention values
+        retention = retention values of cohort (ignores day 0)
+        """
+
+        start = days[-1]
+        end = n_days_to_project
+        day = np.arange(start, end)
+
+        a,b = self.coef_retention_curve(days, retention)
+
+        projected_retention = retention
+
+        for index in day: 
+            y = a * index ** b
+            projected_retention.append(y)
+        
+        return projected_retention
+
+
+
+
 
 
 

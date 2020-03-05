@@ -82,6 +82,52 @@ class DataManager:
         np_array = np.array(temp) * 100
 
         return np_array.astype(int) 
+    
+    def LTV_Model_1(self, days,retention, arpdau):
+        """
+        Modeling ARPDAU using the following formula: 
+        LTV = <ARPDAU> * TotalDaysPlayed
+
+        TotalsDaysPlayed = (1/a-1)*(1-D^(1-a))
+
+        And, returning a Pandas Dataframe: 
+        days, retention, totalDaysPlayed, LTV
+
+        Required_Params: 
+        Days = array of days cohort
+        retention = retention values of cohort
+        arpdau = average revenue per daily active user
+        """
+
+        log_days = np.log(days)
+        log_retention = np.log(retention)
+
+        area = log_retention/log_days
+        a = area[-1]
+
+        totalsDaysPlayed = []
+
+        for index in days:
+            daysPlayed  = (1/(a - 1) * (1 - index ** (1-a)))
+            totalsDaysPlayed .append(daysPlayed )
+        
+        ltv = []
+        
+        for played in totalsDaysPlayed: 
+            ltv_formula = arpdau * played
+            ltv.append(ltv_formula)
+
+        ltv_df = pd.DataFrame({
+        'Days': days,
+        'Retention': retention,
+        'TotalsDaysPlayed': totalsDaysPlayed,
+        'LTV': ltv,})
+
+        ltv_df.set_index('Days', inplace=True)
+
+        return ltv_df
+
+
 
 
     

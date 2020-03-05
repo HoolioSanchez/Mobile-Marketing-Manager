@@ -33,8 +33,10 @@ pp_rev['arpdau'] = pp_rev['revenue'] / dau['DAU']
 #%%
 pp_rev.head()
 #%%
-reten = dm.retentionDataFrame('rentention_data')
-reten.set_index('install_dt', inplace = True)
+pp_rev.to_csv('adrev.csv')
+#%%
+reten = dm.retentionDataFrame('retention_data')
+reten.set_index('INSTALL_DT', inplace = True)
 reten.index = pd.to_datetime(reten.index)
 reten = dm.calculateRetentionPct(reten)
 reten.head()
@@ -58,21 +60,27 @@ print(len(retention_projection))
 
 # %%
 days = np.arange(0,366)
+retention_days = days[:60]
+re_days = pd.DataFrame(retention_days)
 #%%
-reg = LinearRegression().fit(retention_projection)
-# reg.score(days[0:60], retention_projection)
+reg = LinearRegression()
+reg.fit(re_days, profile)
+#%%
+print(reg.score(re_days, retention_projection))
 
+#%%
+reg.predict(profile)
+#%%
+print(reg.predict(profile[-1]))
+print(profile)
 # %%
 retention_days = days[:60]
 
-#%%
 log_days = np.log(retention_days)
 log_retention = np.log(retention_projection)
-# %%
 area = log_retention/log_days
-#%%
 a = area[-1]
-#%%
+
 print(a)
 #%%
 user_lifetime = []
@@ -80,7 +88,8 @@ for index in days:
     agg = (1/(a - 1) * (1 - index ** (1-a)))
     user_lifetime.append(agg)
 
-print(user_lifetime)
+#%%
+print(len(log_retention))
 
 #%%
 # arpdu = float(monthly['AD_REVENUE'] / monthly['INSTALL_QTY'])
@@ -118,5 +127,10 @@ average_rev.head()
 
 # %%
 average_rev.to_csv('ad_rev_per_install.csv')
+
+# %%
+temp = dm.LTV_Model_1(retention_days,retention_projection, arpdu)
+temp.head()
+temp.to_csv('all_data.csv')
 
 # %%

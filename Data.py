@@ -83,21 +83,7 @@ class Data:
 
         return res.json()
 
-    def getDailyActiveUsers(self, path):
-    # "/Users/juliosanchez/Documents/dashboard/dau_data/export.csv"
-        temp = []
-        folderName = path
-        folder = os.getcwd() + '/' + folderName
-
-        for sub, dirs, files in os.walk(folder):
-            for file in files:
-                df = pd.read_csv(os.path.join(sub, file))
-                
-                temp.append(df)
-        return pd.concat(temp)
-
-    def getRetention(self, path):
-    # "/Users/juliosanchez/Documents/dashboard/retention_data/export.csv"
+    def getCSVFolder(self, path):
         temp = []
         folderName = path
         folder = os.getcwd() + '/' + folderName

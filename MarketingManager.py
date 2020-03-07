@@ -13,9 +13,13 @@ class MarketingManager:
         """
         Returns a Pandas DataFrame from Ironsource API
 
-        Params: 
+        Arguments: 
         startDate = required start date
         endDate = required end date
+
+        Returns: 
+            Pandas Dataframe: json normalized dataframe
+
         """
         meta_params = ['adUnits','appKey', 'appName', 'bundleId','date']
         return json_normalize(self.data.getIronsourceData(startDate, endDate), 'data', meta = meta_params)
@@ -25,9 +29,12 @@ class MarketingManager:
         """
         Returns a Pandas DataFrame from Libring API
 
-        Params: 
+        ParaArgumentsms: 
         startDate = required start date
         endDate = required end date
+
+        Returns: 
+            Pandas Dataframe
         """
         temp = []
         libring = self.data.getLibringData(startDate, endDate)
@@ -38,18 +45,27 @@ class MarketingManager:
 
         return pd.DataFrame(temp)
 
-    def retentionDataFrame(self, path):
-        return self.data.getRetention(path)
-    
-    def dailyActiveUserDataframe(self, path):
-        return self.data.getDailyActiveUsers(path)
+    def dataFrameFromFolderPath(self, path):
+        """
+        returns a dataframe from a csv folder path
+
+        Arguments:
+            path to folder containing csv files 
+        
+        Returns: 
+            Pandas Dataframe - containing csv data
+        """
+        return self.data.getCSVFolder(path)
     
     def calculateRetentionPct(self, dataframe):
         """
         Adds Retention percentage for Day 1,7,14,and 90 to Dataframe
 
-        Required Param: 
-        Pandas Dataframe
+        Arguments:
+            dataframe - pandas dataframe containing 'RETENTION_1_QTY' to 'RETENTION_90_QTY' 
+        
+        Returns: 
+            Pandas Dataframe - containing the mean
         """
         dataframe['Day_1_Pct'] = dataframe.RETENTION_1_QTY/dataframe.INSTALL_QTY
         dataframe['Day_3_Pct'] = dataframe.RETENTION_3_QTY/dataframe.INSTALL_QTY
@@ -85,18 +101,20 @@ class MarketingManager:
     
     def LTV_Model_1(self, days,retention, arpdau):
         """
-        Modeling ARPDAU using the following formula: 
-        LTV = <ARPDAU> * TotalDaysPlayed
+        Returns a LTV dataframe using a simple model. 
 
+        Formula: 
+        LTV = <ARPDAU> * TotalDaysPlayed
         TotalsDaysPlayed = (1/a-1)*(1-D^(1-a))
 
-        And, returning a Pandas Dataframe: 
-        days, retention, totalDaysPlayed, LTV
+        Arguments: 
+        days -  array of days cohort
+        retention - retention values of cohort
+        arpdau - average revenue per daily active user
 
-        Required_Params: 
-        Days = array of days cohort
-        retention = retention values of cohort
-        arpdau = average revenue per daily active user
+        Returns: 
+            Pandas Dataframe - containing days, retention, totalDaysPlayed, and LTV
+
         """
 
         log_days = np.log(days)
@@ -127,8 +145,56 @@ class MarketingManager:
 
         return ltv_df
 
+    def coef_retention_curve(self, n_days, n_retention):
+        """
+        Returns the values for a and b in a power function:
+        y = a*x^b
 
+        Arguments:
+        n_days - array of days cohort (ignores day 0)
+        n_retention - retention values of cohort (ignores day 0)
 
+        Returns: 
+            float: a,b 
+        """
 
+        log_days = np.log(n_days)
+        log_retention = np.log(n_retention)
+
+        a = np.exp(np.polyfit(log_days[1:], log_retention[1:], 1))
+        a = a[1]
+
+        b = np.polyfit(log_days[1:], log_retention[1:], 1)
+        b = b[0]
+
+        return a,b
     
+    def project_retention_rates(self, n_days_to_project, days, retention):
+        """
+        Uses a power function to calculate the projected retention rates for given n_days. 
 
+        Formula:
+        y = a*x^b
+
+        Arguments: 
+        n_days_to_project - the number of days to project too.
+        days - original days cohort relative to retention values
+        retention - retention values of cohort (ignores day 0)
+
+        Returns: 
+            list - projected values for retention
+        """
+
+        start = days[-1]
+        end = n_days_to_project
+        day = np.arange(start, end)
+
+        a,b = self.coef_retention_curve(days, retention)
+
+        projected_retention = retention
+
+        for index in day: 
+            y = a * index ** b
+            projected_retention.append(y)
+        
+        return projected_retention

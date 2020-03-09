@@ -11,7 +11,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.metrics import r2_score
 import scipy.interpolate 
 #%%
-dm = MarketingManager()
+mm = MarketingManager()
 th = th.theseus()
 
 #%%
@@ -35,10 +35,10 @@ th = th.theseus()
 # #%%
 # pp_rev.to_csv('adrev.csv')
 #%%
-reten = dm.retentionDataFrame('retention_data')
+reten = mm.dataFrameFromFolderPath('retention_data')
 reten.set_index('install_dt', inplace = True)
 reten.index = pd.to_datetime(reten.index)
-reten = dm.calculateRetentionPct(reten)
+reten = mm.calculateRetentionPct(reten)
 reten.head()
 
 #%%
@@ -47,7 +47,7 @@ monthly.head()
 
 # %%
 x_days = [1,3,7,14,30,60]
-y_data = dm.totalRetentionAverage(reten).tolist()
+y_data = mm.totalRetentionAverage(reten).tolist()
 
 retention_profile = th.create_profile(x_days, y_data[:-1])
 th.plot_retention(retention_profile)

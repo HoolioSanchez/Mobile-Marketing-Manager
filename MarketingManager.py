@@ -5,7 +5,7 @@ from pandas.io.json import json_normalize
 from Data import Data
 import matplotlib.pyplot as plt
 import numpy as np
-
+from apps import app_ids
 #%%
 class MarketingManager:
     data = Data()
@@ -24,7 +24,7 @@ class MarketingManager:
         meta_params = ['adUnits','appKey', 'appName', 'bundleId','date']
         return json_normalize(self.data.getIronsourceData(startDate, endDate), 'data', meta = meta_params)
 
-   
+
     def libringDataFrame(self, startDate, endDate): 
         """
         Returns a Pandas DataFrame from Libring API
@@ -39,11 +39,28 @@ class MarketingManager:
         temp = []
         libring = self.data.getLibringData(startDate, endDate)
 
-        for item in libring['connections']: 
-            print(item)
-            temp.append(item)
+        for index in libring['connections']: 
+            for app in app_ids:
+                if index['app'] == app:
+                    if index['platform'] == 'Android':
+                        index.update({
+                            'app_cd_name': app_ids[app]['app_cd_name'],
+                            'studio': app_ids[app]['studio'],
+                            'application_cd': app_ids[app]['app_cd_android'],
+                            'iron_appkey': app_ids[app]['iron_appkey_android']
+                        })
+                        temp.append(index)
+                    if index['platform'] == 'iOS':
+                        index.update({
+                            'app_cd_name': app_ids[app]['app_cd_name'],
+                            'studio': app_ids[app]['studio'],
+                            'application_cd': app_ids[app]['app_cd_ios'],
+                            'iron_appkey': app_ids[app]['iron_appkey_ios']
+                        })
+                        temp.append(index)
 
         return pd.DataFrame(temp)
+
 
     def dataFrameFromFolderPath(self, path):
         """

@@ -68,7 +68,7 @@ class Data:
             "period": "custom_date",
             "start_date": startDate,
             "end_date": endDate,
-            "group_by": "date,app"
+            "group_by": "date,app,platform"
         }
 
         headers = {
